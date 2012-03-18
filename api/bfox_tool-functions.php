@@ -1,16 +1,5 @@
 <?php
 
-function bfox_tool_url($shortName = '') {
-	$url = get_post_type_archive_link('bfox_tool');
-	if (!empty($shortName)) $url = add_query_arg('tool', $shortName, $url);
-	return $url;
-}
-
-function add_bfox_tool(BfoxBibleToolApi $api, $shortName, $longName = '') {
-	$bfoxTools = BfoxBibleToolController::sharedInstance();
-	$bfoxTools->addTool(new BfoxBibleTool($api, $shortName, $longName));
-}
-
 function active_bfox_tool() {
 	$bfoxTools = BfoxBibleToolController::sharedInstance();
 	return $bfoxTools->activeTool();
@@ -20,37 +9,10 @@ function has_bfox_tool() {
 	return (!is_null(active_bfox_tool()));
 }
 
-/**
- * Loops through Bible Tool links and adds a Bible Tool for each (loaded in Iframe)
- */
-function load_blog_bfox_tools() {
-	$query = bfox_tool_query();
-
-	while ($query->have_posts()) {
-		$query->the_post();
-
-		$url = bfox_tool_meta('url', $post_id);
-		$title = get_the_title();
-		$post = &get_post($id);
-
-		add_bfox_tool(new BfoxWPBibleToolIframeApi($url), $post->post_name, $title);
-	}
-}
 
 /*
  * Reading Tool Meta Data functions
  */
-
-function bfox_tool_meta($key, $post_id = 0) {
-	if (empty($post_id)) $post_id = $GLOBALS['post']->ID;
-	$value = get_post_meta($post_id, '_bfox_tool_' . $key, true);
-	return $value;
-}
-
-function bfox_tool_update_meta($key, $value, $post_id = 0) {
-	if (empty($post_id)) $post_id = $GLOBALS['post']->ID;
-	return update_post_meta($post_id, '_bfox_tool_' . $key, $value);
-}
 
 /*
 Bible Tool Source URL handling
@@ -88,43 +50,6 @@ function is_bfox_tool_link() {
 /*
 Bible Tool Queries
 */
-
-function bfox_tool_query($args = array()) {
-	$args['post_type'] = 'bfox_tool';
-	return new WP_Query($args);
-}
-
-/*
-Functions for remembering the most recent used Bible Reference
-*/
-
-function bfox_tool_last_viewed_ref_str() {
-	global $user_ID;
-	if ($user_ID) return get_user_option('bfox_tool_last_viewed_ref_str');
-	return $_COOKIE['bfox_tool_last_viewed_ref_str'];
-}
-
-function bfox_tool_set_last_viewed_ref_str($ref_str) {
-	global $user_ID;
-	if ($user_ID) update_user_option($user_ID, 'bfox_tool_last_viewed_ref_str', $ref_str, true);
-	else setcookie('bfox_tool_last_viewed_ref_str', $ref_str, /* 30 days from now: */ time() + 60 * 60 * 24 * 30, '/');
-}
-
-/*
-Functions for remembering the most recent used Bible Tool
-*/
-
-function bfox_last_viewed_tool() {
-	global $user_ID;
-	if ($user_ID) return get_user_option('bfox_last_viewed_tool');
-	return $_COOKIE['bfox_last_viewed_tool'];
-}
-
-function set_bfox_last_viewed_tool($shortName) {
-	global $user_ID;
-	if ($user_ID) update_user_option($user_ID, 'bfox_last_viewed_tool', $shortName, true);
-	else setcookie('bfox_last_viewed_tool', $shortName, /* 30 days from now: */ time() + 60 * 60 * 24 * 30, '/');
-}
 
 function selected_bfox_tool_post_id() {
 	global $_selected_bfox_tool_post_id;

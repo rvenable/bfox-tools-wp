@@ -47,4 +47,6 @@ if (defined('BFOX_BIBLIA_API_KEY')) {
 // Loads all Bible Tools links for the blog, displayed in iframes
 $bfox->tools->addToolsFromToolsPostType();
 
+$bfox->tools->registerAjaxDiv('primary', 'main', 'main', true);
+
 ?>

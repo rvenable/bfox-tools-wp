@@ -2,12 +2,7 @@
 
 class BfoxToolContext extends BfoxObject {
 	var $name;
-	var $nonceName;
-
-	/**
-	 * @var BfoxRef
-	 */
-	var $ref;
+	var $dependencyName;
 
 	/**
 	 * @var BfoxToolsController
@@ -16,31 +11,12 @@ class BfoxToolContext extends BfoxObject {
 
 	private $_activeShortName = '';
 
-	function __construct($name, BfoxToolsController $toolsController, $initRefStr = 'Genesis 1') {
+	function __construct($name, BfoxToolsController $toolsController) {
 		$this->name = $name;
 		$this->toolsController = $toolsController;
-		$this->nonceName = 'bfox-tool-context-' . $this->name;
+		$this->dependencyName = 'depends-bfox-tool-context-' . $this->name;
 
 		parent::__construct();
-
-		$this->initRef($initRefStr);
-	}
-
-	protected function initRef($initRefStr) {
-		$ref = new BfoxRef($this->lastViewedRefStr());
-		if (!$ref->is_valid()) {
-			$ref = new BfoxRef($initRefStr);
-			if ($ref->is_valid()) $this->setLastViewedRefStr($ref->get_string());
-		}
-
-		$this->ref = $ref;
-	}
-
-	function setRef(BfoxRef $ref) {
-		if ($ref->is_valid()) {
-			$this->ref = $ref;
-			$this->setLastViewedRefStr($ref->get_string());
-		}
 	}
 
 	protected $tools = array();
@@ -102,33 +78,13 @@ class BfoxToolContext extends BfoxObject {
 		return $content;
 	}
 
-	function lastViewedRefStr() {
-		return $this->toolsController->options->userOptionOrCookie('lastViewedRefStr');
-	}
-
-	function setLastViewedRefStr($refStr) {
-		return $this->toolsController->options->setUserOptionOrCookie('lastViewedRefStr', $refStr);
-	}
-
 	function lastViewedToolName() {
-		return $this->toolsController->options->userOptionOrCookie('lastViewedToolName');
+		return $this->toolsController->options->userOptionOrCookie('lastViewedToolName-' . $this->name);
 	}
 
 	function setLastViewedToolName($toolName) {
-		return $this->toolsController->options->setUserOptionOrCookie('lastViewedToolName', $toolName);
+		return $this->toolsController->options->setUserOptionOrCookie('lastViewedToolName-' . $this->name, $toolName);
 	}
-
-	function nonce() {
-		$nonce = wp_create_nonce($this->nonceName);
-		return $nonce;
-	}
-
-	function ajaxUrl($nonce = '') {
-		if (empty($nonce)) $nonce = $this->nonce();
-		$url = add_query_arg(array('action' => 'bfox-tool-content', 'context' => $this->name, 'nonce' => $nonce), admin_url('admin-ajax.php'));
-		return $url;
-	}
-
 }
 
 ?>

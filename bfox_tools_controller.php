@@ -9,6 +9,7 @@ class BfoxToolsController extends BfoxRootPluginController {
 
 		require_once $this->dir . '/bfox_tool_context.php';
 		require_once $this->dir . '/bfox_bible_tool.php';
+		require_once $this->dir . '/bfox_tools_ajax_div.php';
 
 		require_once $this->core->refDir . '/bfox_bible_tool_link.php';
 		require_once $this->core->refDir . '/bfox_bible_tool_api.php';
@@ -19,8 +20,7 @@ class BfoxToolsController extends BfoxRootPluginController {
 		require_once $this->apiDir . '/bfox_tool-functions.php';
 		require_once $this->apiDir . '/bfox_tool-template.php';
 
-		$this->addAction('wp_ajax_nopriv_bfox-tool-content', 'ajaxContent');
-		$this->addAction('wp_ajax_bfox-tool-content', 'ajaxContent');
+		$this->contextStack = new BfoxStack();
 	}
 
 	function urlForToolName($shortName = '') {
@@ -36,6 +36,11 @@ class BfoxToolsController extends BfoxRootPluginController {
 	function addToolApi(BfoxBibleToolApi $api, $shortName, $longName = '') {
 		$context = $this->mainContext();
 		$context->addTool(new BfoxBibleTool($api, $shortName, $longName));
+	}
+
+	function hasTools() {
+		$context = $this->mainContext();
+		return $context->hasTools();
 	}
 
 	function postTypeQuery($args = array()) {
@@ -58,6 +63,24 @@ class BfoxToolsController extends BfoxRootPluginController {
 
 			$this->addToolApi(new BfoxWPBibleToolIframeApi($url), $post->post_name, $title);
 		}
+	}
+
+	function pushContext(BfoxToolContext $item) {
+		$this->core->stackGroup->push('toolContext', $item);
+	}
+
+	/**
+	 * @return BfoxToolContext
+	 */
+	function popContext() {
+		return $this->core->stackGroup->pop('toolContext');
+	}
+
+	/**
+	 * @return BfoxToolContext
+	 */
+	function currentContext() {
+		return $this->core->stackGroup->current('toolContext');
 	}
 
 	function wpInit() {
@@ -88,7 +111,7 @@ class BfoxToolsController extends BfoxRootPluginController {
 		* Doesn't work for Bible APIs loaded via javascript because we can't inject javascript via javascript
 		* TODO: figure out why our Script element injection isn't working
 		*/
-		wp_enqueue_script('bfox_tool', $this->url . '/bfox_tool.js', array('jquery'), $this->version);
+		wp_enqueue_script('bfox_tool', $this->url . '/bfox_tool.js', array('bfox_ajax', 'jquery'), $this->version);
 	}
 
 	function registerMetaBox() {
@@ -138,7 +161,7 @@ class BfoxToolsController extends BfoxRootPluginController {
 	 * @return BfoxRefLinker
 	 */
 	function linkerForSelector($selector, $useTooltips = false) {
-		$linker = $this->core->basicLinker($useTooltips);
+		$linker = $this->core->refs->basicLinker($useTooltips);
 		$linker->addClass('bfox-ref-update');
 		$linker->attributeValues['data-selector'] = $selector;
 
@@ -165,7 +188,7 @@ class BfoxToolsController extends BfoxRootPluginController {
 
 		if (!empty($_REQUEST['id'])) {
 			// Bible links update the same id that was just updated
-			$this->core->pushRefLinker($this->linkerForSelector('#' . $_REQUEST['id']));
+			$this->core->refs->pushLinker($this->linkerForSelector('#' . $_REQUEST['id']));
 		}
 
 		ob_start();
@@ -246,17 +269,44 @@ class BfoxToolsController extends BfoxRootPluginController {
 
 	function wpParseRequest($wp) {
 		if (isset($wp->query_vars['post_type']) && 'bfox_tool' == $wp->query_vars['post_type']) {
-			$context = $this->mainContext();
+			$refContext = $this->core->refs->mainContext();
 
 			if (isset($wp->query_vars['ref'])) {
-				$context->setRef(new BfoxRef($wp->query_vars['ref']));
+				$refContext->setRef(new BfoxRef($wp->query_vars['ref']));
 			}
-			$wp->query_vars['ref'] = $context->ref->get_string();
+			$wp->query_vars['ref'] = $refContext->ref->get_string();
 
 			if (isset($wp->query_vars['tool'])) {
-				$context->setActiveTool($wp->query_vars['tool']);
+				$toolContext = $this->mainContext();
+				$toolContext->setActiveTool($wp->query_vars['tool']);
 			}
 		}
+	}
+
+	function idForToolAjaxDiv($name) {
+		return 'bfox-tools-ajax-div-' . $name;;
+	}
+
+	/**
+	 * @return BfoxToolsAjaxDiv
+	 */
+	function ajaxDiv($name) {
+		$id = $this->idForToolAjaxDiv($name);
+		$div = $this->core->ajaxDiv($id);
+		return $div;
+	}
+
+	function echoAjaxDiv($name) {
+		$div = $this->ajaxDiv($name);
+
+		if (!is_null($div)) {
+			$div->echoInitialContent();
+		}
+	}
+
+	function registerAjaxDiv($name, $toolContextName, $refContextName, $enableNoPrivilege = false) {
+		$div = new BfoxToolsAjaxDiv($name, $this, $toolContextName, $refContextName);
+		return $this->core->registerAjaxDiv($div, $enableNoPrivilege);
 	}
 }
 

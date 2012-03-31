@@ -21,10 +21,10 @@ get_header(); ?>
 <section id="primary">
 	<div id="content" role="main">
 
-	<?php $bfox->pushRefLinker($bfox->tools->linkerForSelector('#bfox-tool-ref-global')); // Bible links update #bfox-tool-ref-global ?>
-	<?php $context = $bfox->tools->mainContext(); ?>
+	<?php $toolContext = $bfox->tools->contextForName('main'); ?>
+	<?php $refContext = $bfox->refs->contextForName('main'); ?>
 
-	<?php if ( $context->hasTools() ) : ?>
+	<?php if ( $bfox->tools->hasTools() ) : ?>
 
 		<header class="page-header">
 			<h1 class="page-title">
@@ -33,14 +33,12 @@ get_header(); ?>
 		</header>
 
 		<form method="get" id="bible-form" action="<?php echo esc_url( $bfox->tools->urlForToolName() ); ?>" class="bfox-tool-form">
-			<input type="text" id="bfox-tool-ref-global" class="field bfox-tool-ref" name="ref" placeholder="<?php esc_attr_e( 'Search' ); ?>" value="<?php echo $context->ref->get_string(BibleMeta::name_short) ?>" />
-			<select class="bfox-tool-name" id="bfox-tool-name-main" name="tool"><?php echo $context->selectOptions(); ?></select>
+			<input type="text" id="bfox-tool-ref-global" class="field bfox-tool-ref" name="ref" placeholder="<?php esc_attr_e( 'Search' ); ?>" value="<?php echo $refContext->ref->get_string(BibleMeta::name_short) ?>" />
+			<select class="bfox-tool-name" id="bfox-tool-name-main" name="tool"><?php echo $toolContext->selectOptions(); ?></select>
 			<input type="submit" class="submit" value="<?php esc_attr_e( 'Go' ); ?>" />
 		</form>
 
-		<div class="depends-bfox-tool-ref-global depends-bfox-tool-name-main" data-url="<?php echo $context->ajaxUrl(); ?>">
-		<?php $bfox->tools->loadTemplate('content-bfox_tool'); ?>
-		</div>
+		<?php $bfox->tools->echoAjaxDiv('primary'); ?>
 
 	<?php else : ?>
 
@@ -55,8 +53,6 @@ get_header(); ?>
 		</article><!-- #post-0 -->
 
 	<?php endif; ?>
-
-	<?php $bfox->popLinker(); // #bfox-tool-ref-global ?>
 
 	</div><!-- #content -->
 </section><!-- #primary -->

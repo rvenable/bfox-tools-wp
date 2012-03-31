@@ -7,10 +7,6 @@ jQuery(document).ready(function () {
 	 * Add BfoxAjax functions
 	 */
 	
-	BfoxAjax.appendUrlWithParamString = function (url, paramString) {
-		return url + ((url.indexOf('?') === -1) ? '?' : '&') + paramString;
-	};
-
 	BfoxAjax.toolValueChanged = function (id, key, value) {
 		var parameters, url, updatingElement, obj;
 

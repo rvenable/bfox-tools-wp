@@ -29,8 +29,28 @@ get_header(); ?>
 			</h1>
 		</header>
 
-		<?php $bfox->tools->echoAjaxDiv('primary-search'); ?>
-		<?php $bfox->tools->echoAjaxDiv('primary'); ?>
+		<?php
+		/*
+		 * Search form for primary bible navigation
+		 */
+		$div = $bfox->tools->ajaxDiv('primary-search');
+
+		// Use the 'main' tool context and the 'main' ref context
+		$div->setContextNames('main', 'main');
+		$div->echoInitialContent();
+		?>
+
+		<?php
+		/*
+		 * Primary bible content
+		 */
+		$div = $bfox->tools->ajaxDiv('primary');
+
+		// Use the 'main' tool context and the 'main' ref context
+		$div->setContextNames('main', 'main');
+		$div->loadDynamically(); // Don't load the content until the page is loaded, then load it via AJAX
+		$div->echoInitialContent();
+		?>
 
 	<?php else : ?>
 

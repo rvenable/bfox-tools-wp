@@ -21,6 +21,11 @@ class BfoxToolsAjaxDiv extends BfoxAjaxDiv {
 		$this->template = 'bfox-tool-content-' . $name;
 	}
 
+	function setContextNames($toolContextName, $refContextName) {
+		$this->toolContextName = $toolContextName;
+		$this->refContextName = $refContextName;
+	}
+
 	/**
 	 * @return BfoxToolContext
 	 */

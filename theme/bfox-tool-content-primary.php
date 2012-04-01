@@ -11,8 +11,6 @@ $toolContext = $bfox->tools->currentContext();
 $tool = $toolContext->activeTool();
 
 ?>
-<div class="bfox-tool-context bfox-ref-context-main bfox-tool-context-main">
-</div>
 		<article id="bfox_bible-<?php echo $tool->shortName; ?>" class="bfox_bible">
 			<header class="entry-header">
 				<h1 class="entry-title"><?php echo $bfox->refs->link($refContext->ref); ?> - <?php echo $tool->longName; ?></h1>

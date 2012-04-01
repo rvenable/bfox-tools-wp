@@ -50,4 +50,7 @@ $bfox->tools->addToolsFromToolsPostType();
 $bfox->tools->registerAjaxDiv('primary', 'main', 'main', true);
 $bfox->tools->registerAjaxDiv('primary-search', 'main', 'main', true);
 
+// Setup jQuery fade in/out animations for ajax refreshes
+$bfox->setAjaxRefreshAnimations('fast', 0.5);
+
 ?>

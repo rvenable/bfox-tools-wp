@@ -55,8 +55,8 @@ jQuery(document).ready(function () {
 	});
 	
 	// select.bfox-tool-name should update the Bible tool on value change 
-	jQuery('select.bfox-tool-name').change(function () {
-		BfoxAjax.toolNameValueChanged(this);
+	jQuery('select.bfox-tool-context-updater').live('change', function () {
+		return BfoxAjax.refreshSelectorForKeyValue(jQuery(this).attr('data-selector'), 'tool', jQuery(this).val());
 	});
 	
 	// a.bfox-ref-update links should update the ref value for a specified selector

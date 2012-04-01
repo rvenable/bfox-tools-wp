@@ -3,6 +3,7 @@
 class BfoxToolContext extends BfoxObject {
 	var $name;
 	var $dependencyName;
+	var $updaterClass;
 
 	/**
 	 * @var BfoxToolsController
@@ -15,6 +16,7 @@ class BfoxToolContext extends BfoxObject {
 		$this->name = $name;
 		$this->toolsController = $toolsController;
 		$this->dependencyName = 'depends-bfox-tool-context-' . $this->name;
+		$this->updaterClass = 'bfox-tool-context-updater';
 
 		parent::__construct();
 	}
@@ -76,6 +78,10 @@ class BfoxToolContext extends BfoxObject {
 		}
 
 		return $content;
+	}
+
+	function dependencySelectorAttribute() {
+		return 'data-selector=".' . $this->dependencyName . '"';
 	}
 
 	function lastViewedToolName() {

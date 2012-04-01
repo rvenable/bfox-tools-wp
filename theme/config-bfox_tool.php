@@ -48,5 +48,6 @@ if (defined('BFOX_BIBLIA_API_KEY')) {
 $bfox->tools->addToolsFromToolsPostType();
 
 $bfox->tools->registerAjaxDiv('primary', 'main', 'main', true);
+$bfox->tools->registerAjaxDiv('primary-search', 'main', 'main', true);
 
 ?>

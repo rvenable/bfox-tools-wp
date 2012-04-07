@@ -218,8 +218,8 @@ class BfoxToolsController extends BfoxRootPluginController {
 		return update_post_meta($post_id, '_bfox_tool_' . $key, $value);
 	}
 
-	function wpSavePost($post_id, $post) {
-		if ('bfox_tool' == $_POST['post_type']) {
+	function wp2SavePost($post_id, $post) {
+		if (isset($_POST['post_type']) && 'bfox_tool' == $_POST['post_type']) {
 			// See: http://codex.wordpress.org/Function_Reference/add_meta_box
 
 			// verify this came from the our screen and with proper authorization,

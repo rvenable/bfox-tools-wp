@@ -13,12 +13,18 @@ class BfoxToolsAjaxDiv extends BfoxAjaxDiv {
 	var $template;
 
 	function __construct($name, BfoxToolsController $tools, $toolContextName, $refContextName) {
-		parent::__construct($name);
 		$this->core = $tools->core;
-		$this->id = $tools->idForToolAjaxDiv($this->name);
+
+		parent::__construct($name);
+
 		$this->toolContextName = $toolContextName;
 		$this->refContextName = $refContextName;
 		$this->template = 'bfox-tool-content-' . $name;
+	}
+
+	function init() {
+		$this->id = $this->core->tools->idForToolAjaxDiv($this->name);
+		parent::init();
 	}
 
 	function setContextNames($toolContextName, $refContextName) {

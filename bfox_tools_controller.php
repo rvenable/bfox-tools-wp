@@ -308,6 +308,57 @@ class BfoxToolsController extends BfoxRootPluginController {
 		$div = new BfoxToolsAjaxDiv($name, $this, $toolContextName, $refContextName);
 		return $this->core->registerAjaxDiv($div, $enableNoPrivilege);
 	}
+
+	/**
+	 * Add a Bible quick view meta box
+	 *
+	 * @param $postType
+	 * @param $context
+	 * @param $priority
+	 */
+	function addEditPostMetaBoxForPostType($postType, $context = 'normal', $priority = 'core') {
+		add_meta_box('bfox-tools-edit-post-meta-box', __('Bible References', 'bfox'), $this->functionWithName('echoEditPostMetaBoxContent'), $postType, $context, $priority);
+	}
+
+	function addEditPostMetaBoxForAllIndexedPostTypes($context = 'normal', $priority = 'core') {
+		$postTypes = $this->core->index->indexedPostTypes();
+		foreach ($postTypes as $postType) {
+			$this->addEditPostMetaBoxForPostType($postType, $context, $priority);
+		}
+	}
+
+	/**
+	 * Creates the form displaying the scripture quick view
+	 *
+	 */
+	function echoEditPostMetaBoxContent() {
+		global $post;
+
+		$div = $this->ajaxDiv('edit-post');
+
+		$div->setContextNames('main', 'main');
+		$div->loadDynamically(); // Don't load the content until the page is loaded, then load it via AJAX
+
+		$ref = $this->core->index->refForPost($post);
+		$refContext = $div->refContext();
+
+		$this->core->refs->pushContext($refContext);
+
+		?>
+		<p>
+		<?php if ($ref->is_valid()): ?>
+			<?php _e('This post is currently referencing:', 'bfox'); ?> <?php echo $this->core->refs->links($ref) ?><br/>
+		<?php else: ?>
+			<?php _e('This post currently has no Bible references.', 'bfox'); ?>
+		<?php endif ?>
+			<?php _e('Add more bible references by typing them into the post, or adding them to the post tags.', 'bfox'); ?>
+		</p>
+		<?php
+
+		$this->core->refs->popContext();
+
+		$div->echoInitialContent();
+	}
 }
 
 ?>

@@ -114,6 +114,13 @@ class BfoxToolsController extends BfoxRootPluginController {
 		wp_enqueue_script('bfox_tool', $this->url . '/bfox_tool.js', array('bfox_ajax', 'jquery'), $this->version);
 	}
 
+	function wpAdminInit() {
+		$this->registerAjaxDiv('edit-post', 'edit-post', 'edit-post');
+
+		// Add a meta box for reading Bible passages to each post type that is indexed
+		$this->addEditPostMetaBoxForAllIndexedPostTypes();
+	}
+
 	function registerMetaBox() {
 		add_meta_box('bfox-tool-link', __('External Link', 'bfox'), $this->functionWithName('linkMetaBox'), 'bfox_tool', 'normal', 'high');
 	}
